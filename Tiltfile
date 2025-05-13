@@ -50,8 +50,9 @@ docker_build(
     'it-project-music-streaming-service-backend-image',
     '.',
     dockerfile='./backend/dockerfile',
+    only=['backend', '.env'],
     live_update=[
-        sync('backend/main.py', '/app/main.py'),
+        sync('backend/', '/app/'),
         run('cd /app && pip install -r requirements.txt',
             trigger='./backend/requirements.txt'),
     ]

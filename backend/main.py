@@ -1,11 +1,21 @@
-import time
-from configs.environment import get_environment_variables
-from models.base_model import create_tables
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-create_tables()
+from backend.api.routers import users
+from configs.depends import lifespan
+from api.routers import album, artist, track
 
-print(f'settings = {get_environment_variables()}')
+app = FastAPI(lifespan=lifespan)
 
-while True:
-    print(f'hi {time.time()}')
-    time.sleep(5)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(album.router)
+app.include_router(artist.router)
+app.include_router(track.router)
+
+app.include_router(users.router)
