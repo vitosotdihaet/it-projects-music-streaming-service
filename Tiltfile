@@ -12,6 +12,7 @@ for line in str(read_file('.env')).splitlines():
 
 yaml_files = [
     'k8s/backend.yaml',
+    'k8s/frontend.yaml',
     'k8s/minio.yaml',
     'k8s/psql-accounts.yaml',
     'k8s/psql-music.yaml',
@@ -57,4 +58,18 @@ docker_build(
         run('cd /app && pip install -r requirements.txt',
             trigger='./backend/requirements.txt'),
     ]
+)
+
+docker_build(
+    'music-frontend-image',
+    './frontend',
+    dockerfile='./frontend/dockerfile',
+    live_update=[
+        sync('frontend/', '/app/'),
+    ]
+)
+
+k8s_resource(
+    'music-frontend',
+    port_forwards=[env_vars['FRONTEND_PORT']+':80']
 )
