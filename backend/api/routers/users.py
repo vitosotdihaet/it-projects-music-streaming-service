@@ -12,15 +12,14 @@ from typing import Optional
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
 
-@router.get("/user/{user_id}", response_model=dto.User, status_code=status.HTTP_200_OK)
+@router.get("/user", response_model=dto.User, status_code=status.HTTP_200_OK)
 async def get_user(
-    user_id: int,
     account_service: AccountService = Depends(get_accounts_service),
-    user_data=Depends(check_access),
+    user_data: dto.UserMiddleware = Depends(check_access),
 ):
     user: Optional[dto.User] = None
     try:
-        user = await account_service.get_user(dto.UserID(id=user_id))
+        user = await account_service.get_user(dto.UserID(id=user_data.id))
     except AccountsBaseException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
